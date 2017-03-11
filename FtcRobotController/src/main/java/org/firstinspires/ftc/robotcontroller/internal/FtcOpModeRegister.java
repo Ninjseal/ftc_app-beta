@@ -35,7 +35,11 @@ import com.google.blocks.ftcrobotcontroller.runtime.BlocksOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeRegister;
 import com.qualcomm.robotcore.eventloop.opmode.AnnotatedOpModeRegistrar;
+
+import org.firstinspires.ftc.robotcontroller.external.samples.AutonomousBeta;
+import org.firstinspires.ftc.robotcontroller.external.samples.AutonomousModeTest;
 import org.firstinspires.ftc.robotcontroller.external.samples.ConceptNullOp;
+import org.firstinspires.ftc.robotcontroller.external.samples.DriverFinal;
 
 /**
  * {@link FtcOpModeRegister} is responsible for registering opmodes for use in an FTC game.
@@ -77,5 +81,9 @@ public class FtcOpModeRegister implements OpModeRegister {
         /**
          * Any manual OpMode class registrations should go here.
          */
+
+        manager.register("DriverFinal", DriverFinal.class);
+        manager.register("AutonomousTest", AutonomousModeTest.class);
+        manager.register("AutonomousBeta", AutonomousBeta.class);
     }
 }

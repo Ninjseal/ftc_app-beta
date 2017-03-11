@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Autonomous(name = "AutonomousBeta", group = "AutonomousMode")
+@Autonomous(name = "AutonomousModeTest", group = "AutonomousMode")
 //@Disabled
-public class AutonomousBeta extends AutonomousMode {
+public class AutonomousModeTest extends AutonomousMode {
 
     @Override
     protected void initOpMode() throws InterruptedException {
@@ -24,13 +24,27 @@ public class AutonomousBeta extends AutonomousMode {
         rightMotorF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotorB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        // Move forward 10 cm keeping 0 degrees
-        gyroDrive(FORWARD_SPEED, cmToInch(10), 0);
+        // Move forward for 1 second
+        forward(FORWARD_SPEED);
+        wait(1.0);
+        stopWheels();
+
+        // Throw Ball 1
+        throwBall(throwPower, throwDistance);
+        wait(1.0);
+        // Throw Ball 2
+        servoSelector.setPosition(SELECTOR_UP);
+        wait(1.0);
+        servoSelector.setPosition(SELECTOR_DOWN);
+        wait(1.5);
+        throwBall(throwPower, throwDistance);
+        wait(1.0);
+
+        // Move forward 5 cm keeping 0 degrees
+        gyroDrive(FORWARD_SPEED, cmToInch(5), 0);
 
         // Turn 90 degrees CW
-        gyroTurn(TURN_SPEED, 90);
-
-        throwBall(throwPower, throwDistance);
+        gyroTurn(TURN_SPEED, 45);
     }
 
     protected void exitOpMode() throws InterruptedException {

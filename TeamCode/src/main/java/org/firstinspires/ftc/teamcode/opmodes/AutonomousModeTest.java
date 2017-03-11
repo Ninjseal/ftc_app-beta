@@ -34,17 +34,17 @@ public class AutonomousModeTest extends AutonomousMode {
         wait(1.0);
         // Throw Ball 2
         servoSelector.setPosition(SELECTOR_UP);
-        sleep(50);
+        wait(1.0);
         servoSelector.setPosition(SELECTOR_DOWN);
         wait(1.5);
         throwBall(throwPower, throwDistance);
         wait(1.0);
 
-        // Move forward 5 inches keeping 0 degrees
-        gyroDrive(FORWARD_SPEED, 5, 0);
+        // Move forward 5 cm keeping 0 degrees
+        gyroDrive(FORWARD_SPEED, cmToInch(5), 0);
 
         // Turn 90 degrees CW
-        gyroTurn(TURN_SPEED, 90);
+        gyroTurn(TURN_SPEED, 45);
     }
 
     protected void exitOpMode() throws InterruptedException {
