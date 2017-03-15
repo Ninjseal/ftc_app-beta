@@ -34,27 +34,30 @@ public abstract class AutonomousMode extends LinearOpMode {
     protected OpticalDistanceSensor odsSensor = null;
     protected ModernRoboticsI2cRangeSensor rangeSensor = null;
     // Constants
-    protected static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
-    protected static final double     DRIVE_GEAR_REDUCTION    = 2.0 ;     // This is < 1.0 if geared UP
-    protected static final double     WHEEL_DIAMETER_INCH   = 4;     // For figuring circumference
-    protected static final double     COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCH * 3.1415);
+    protected static final double COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
+    protected static final double DRIVE_GEAR_REDUCTION    = 2.0 ;     // This is < 1.0 if geared UP
+    protected static final double WHEEL_DIAMETER_INCH   = 4.0;     // For figuring circumference
+    protected static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCH * 3.1415);
 
     protected static final double SELECTOR_UP = 1.0;
     protected static final double SELECTOR_DOWN = 0.3;
-    protected static final double BOX_UP= 0.0;
+    protected static final double BOX_UP = 0.0;
     protected static final double MID_SERVO = 0.5;
     protected static final double BEACON_LEFT = 0.0;
     protected static final double BEACON_RIGHT = 1.0;
+
     protected static final double FORWARD_SPEED = 0.7;
     protected static final double TURN_SPEED = 0.2;
+
     protected static final double HEADING_THRESHOLD = 1;
     protected static final double P_TURN_COEFF = 0.1;
     protected static final double P_DRIVE_COEFF = 0.15;
     // Additional helper variables
-    protected double leftWheelsPower = 0, rightWheelsPower = 0;
-    protected int throwDistance = 1577;
-    protected double throwPower = 1;
     protected ElapsedTime runtime = new ElapsedTime();
+
+    protected double leftWheelsPower = 0, rightWheelsPower = 0;
+    protected int throwDistance = 1085;
+    protected double throwPower = 1;
 
         @Override
         public void runOpMode() throws InterruptedException {
@@ -97,16 +100,20 @@ public abstract class AutonomousMode extends LinearOpMode {
         colorSensor = hardwareMap.colorSensor.get("color");
         odsSensor = hardwareMap.opticalDistanceSensor.get("ods");
         // Set the wheel motors
-        leftMotorF.setDirection(DcMotor.Direction.REVERSE);
-        leftMotorB.setDirection(DcMotor.Direction.REVERSE);
-        rightMotorF.setDirection(DcMotor.Direction.FORWARD);
-        rightMotorB.setDirection(DcMotor.Direction.FORWARD);
+        leftMotorF.setDirection(DcMotor.Direction.FORWARD);
+        leftMotorB.setDirection(DcMotor.Direction.FORWARD);
+        rightMotorF.setDirection(DcMotor.Direction.REVERSE);
+        rightMotorB.setDirection(DcMotor.Direction.REVERSE);
         leftMotorF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftMotorB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightMotorF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightMotorB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftMotorF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftMotorB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotorF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotorB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // Set the throw motor
-        throwMotor.setDirection(DcMotor.Direction.FORWARD);
+        throwMotor.setDirection(DcMotor.Direction.REVERSE);
         throwMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         throwMotor.setMaxSpeed(1120);
         // Set servo directions
@@ -146,7 +153,7 @@ public abstract class AutonomousMode extends LinearOpMode {
         double powerRightMotorB = 0.0;
         double powerRightMotorF = 0.0;
 
-        while(!finish) {
+        while(opModeIsActive() && !finish) {
             double correction = (PERFECT_COLOR_VALUE - odsSensor.getLightDetected()) * 5;
 
             // Set the powers so they are no less than .075 and apply to correction
@@ -237,8 +244,10 @@ public abstract class AutonomousMode extends LinearOpMode {
 
     // Gyro related autonomous functions
     protected void gyroDrive ( double speed, double distance, double angle) {
-        int     newLeftTarget;
-        int     newRightTarget;
+        int     newLeftFTarget;
+        int     newRightFTarget;
+        int     newLeftBTarget;
+        int     newRightBTarget;
         int     moveCounts;
         double  max;
         double  error;
@@ -251,14 +260,16 @@ public abstract class AutonomousMode extends LinearOpMode {
 
             // Determine new target position, and pass to motor controller
             moveCounts = (int)(distance * COUNTS_PER_INCH);
-            newLeftTarget = leftMotorF.getCurrentPosition() + moveCounts;
-            newRightTarget = rightMotorF.getCurrentPosition() + moveCounts;
+            newLeftFTarget = leftMotorF.getCurrentPosition() + moveCounts;
+            newLeftBTarget = leftMotorB.getCurrentPosition() + moveCounts;
+            newRightFTarget = rightMotorF.getCurrentPosition() + moveCounts;
+            newRightBTarget = rightMotorB.getCurrentPosition() + moveCounts;
 
             // Set Target and Turn On RUN_TO_POSITION
-            leftMotorF.setTargetPosition(newLeftTarget);
-            rightMotorF.setTargetPosition(newRightTarget);
-            leftMotorB.setTargetPosition(newLeftTarget);
-            rightMotorB.setTargetPosition(newRightTarget);
+            leftMotorF.setTargetPosition(newLeftFTarget);
+            rightMotorF.setTargetPosition(newRightFTarget);
+            leftMotorB.setTargetPosition(newLeftBTarget);
+            rightMotorB.setTargetPosition(newRightBTarget);
 
             leftMotorF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             rightMotorF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -296,9 +307,12 @@ public abstract class AutonomousMode extends LinearOpMode {
 
                 // Display drive status for the driver.
                 telemetry.addData("Err/St",  "%5.1f/%5.1f",  error, steer);
-                telemetry.addData("Target",  "%7d:%7d",      newLeftTarget,  newRightTarget);
-                telemetry.addData("Actual",  "%7d:%7d",      leftMotorF.getCurrentPosition(),
+                telemetry.addData("TargetF",  "%7d:%7d",      newLeftFTarget,  newRightFTarget);
+                telemetry.addData("TargetB",  "%7d:%7d",      newLeftBTarget,  newRightBTarget);
+                telemetry.addData("ActualF",  "%7d:%7d",      leftMotorF.getCurrentPosition(),
                         rightMotorF.getCurrentPosition());
+                telemetry.addData("ActualB",  "%7d:%7d",      leftMotorB.getCurrentPosition(),
+                        rightMotorB.getCurrentPosition());
                 telemetry.addData("Speed",   "%5.2f:%5.2f",  leftSpeed, rightSpeed);
                 telemetry.update();
             }
@@ -367,6 +381,110 @@ public abstract class AutonomousMode extends LinearOpMode {
         return Range.clip(error * PCoeff, -1, 1);
     }
     //Gyro
+
+    // Drive with encoders
+    public void encoderDrive(double speed,
+                             double leftInches, double rightInches,
+                             double timeoutS) {
+        int     newLeftFTarget;
+        int     newRightFTarget;
+        int     newLeftBTarget;
+        int     newRightBTarget;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newLeftFTarget = leftMotorF.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+            newRightFTarget = rightMotorF.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+            newLeftBTarget = leftMotorB.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+            newRightBTarget = rightMotorB.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+
+            leftMotorF.setTargetPosition(newLeftFTarget);
+            rightMotorF.setTargetPosition(newRightFTarget);
+            leftMotorB.setTargetPosition(newLeftBTarget);
+            rightMotorB.setTargetPosition(newRightBTarget);
+
+
+            // Turn On RUN_TO_POSITION
+            leftMotorF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightMotorF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftMotorB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightMotorB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            move(Math.abs(speed), Math.abs(speed));
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (leftMotorF.isBusy() && rightMotorF.isBusy() && leftMotorB.isBusy()) && rightMotorB.isBusy()) {
+
+                // Display it for the driver.
+                telemetry.addData("TargetF",  "%7d:%7d",      newLeftFTarget,  newRightFTarget);
+                telemetry.addData("TargetB",  "%7d:%7d",      newLeftBTarget,  newRightBTarget);
+                telemetry.addData("ActualF",  "%7d:%7d",      leftMotorF.getCurrentPosition(),
+                        rightMotorF.getCurrentPosition());
+                telemetry.addData("ActualB",  "%7d:%7d",      leftMotorB.getCurrentPosition(),
+                        rightMotorB.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            stopWheels();
+
+            // Turn off RUN_TO_POSITION
+            leftMotorF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightMotorF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            leftMotorB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightMotorB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            //  sleep(250);   // optional pause after each move
+        }
+    }
+    //EncoderDrive
+
+    // Turn using encoder, trigo = 1 for CW and trigo = -1 for CCW
+    public void encoderTurn(double power, int distance, int trigo){
+
+        ///distance = 1680 for 90 degrees
+
+        leftMotorF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftMotorB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightMotorF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightMotorB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftMotorF.setTargetPosition(-distance*trigo);
+        leftMotorB.setTargetPosition(-distance*trigo);
+        rightMotorF.setTargetPosition(distance*trigo);
+        rightMotorB.setTargetPosition(distance*trigo);
+
+        leftMotorF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftMotorB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightMotorF.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightMotorB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftMotorF.setPower(Range.clip(power*trigo, -1, 1));
+        rightMotorF.setPower(Range.clip(power*trigo, -1, 1));
+        leftMotorB.setPower(Range.clip(-power*trigo, -1, 1));
+        rightMotorB.setPower(Range.clip(-power*trigo, -1, 1));
+
+
+        while(leftMotorF.isBusy() && leftMotorB.isBusy() && rightMotorF.isBusy() && rightMotorB.isBusy()){
+            //wait until target position is reached
+        }
+
+        // Stop the wheels
+        stopWheels();
+
+        leftMotorF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftMotorB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotorF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotorB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+    //EncoderTurn
 
     // Move the robot based on left and right powers
     protected void move(double leftWheelsPower, double rightWheelsPower) {

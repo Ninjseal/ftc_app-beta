@@ -24,13 +24,9 @@ public class AutonomousBeta extends AutonomousMode {
         rightMotorF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightMotorB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        // Move forward 10 cm keeping 0 degrees
-        gyroDrive(FORWARD_SPEED, cmToInch(10), 0);
+        // Turn right 90 degrees
+        encoderTurn(TURN_SPEED, 1680, 1);
 
-        // Turn 90 degrees CW
-        gyroTurn(TURN_SPEED, 90);
-
-        throwBall(throwPower, throwDistance);
     }
 
     protected void exitOpMode() throws InterruptedException {

@@ -40,7 +40,7 @@ public class DriverFinal extends OpMode {
     private double leftWheelsPower = 0, rightWheelsPower = 0;
 
     private double deadzone = 0.1;
-    private int throwDistance = 1577;
+    private int throwDistance = 1085;
 
     private double throwPower = 1;
     private double vacuumPower = 0.9;
@@ -73,7 +73,7 @@ public class DriverFinal extends OpMode {
         rightMotorF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotorB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // Set the throw motor
-        throwMotor.setDirection(DcMotor.Direction.FORWARD);
+        throwMotor.setDirection(DcMotor.Direction.REVERSE);
         throwMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         throwMotor.setMaxSpeed(1120);
         // Set the capping mechanism direction

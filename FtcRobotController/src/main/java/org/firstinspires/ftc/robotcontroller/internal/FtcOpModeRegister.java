@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpModeRegister;
 import com.qualcomm.robotcore.eventloop.opmode.AnnotatedOpModeRegistrar;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.AutonomousBeta;
+import org.firstinspires.ftc.robotcontroller.external.samples.AutonomousDee;
 import org.firstinspires.ftc.robotcontroller.external.samples.AutonomousModeTest;
 import org.firstinspires.ftc.robotcontroller.external.samples.ConceptNullOp;
 import org.firstinspires.ftc.robotcontroller.external.samples.DriverFinal;
@@ -83,7 +84,8 @@ public class FtcOpModeRegister implements OpModeRegister {
          */
 
         manager.register("DriverFinal", DriverFinal.class);
-        manager.register("AutonomousTest", AutonomousModeTest.class);
-        manager.register("AutonomousBeta", AutonomousBeta.class);
+        manager.register("GyroTurnTest", AutonomousModeTest.class);
+        manager.register("EncoderTurnTest", AutonomousBeta.class);
+        manager.register("GyroDriveDistance", AutonomousDee.class);
     }
 }
