@@ -136,7 +136,7 @@ public abstract class AutonomousMode extends LinearOpMode {
         servoSelector.setPosition(SELECTOR_DOWN);
         servoBeacon.setPosition(MID_SERVO);
         // Calibrate gyro
-        gyroSensor.calibrate();
+        //gyroSensor.calibrate();
     }
 
     // Autonomous function for following the line to the beacon
@@ -430,6 +430,7 @@ public abstract class AutonomousMode extends LinearOpMode {
                         rightMotorF.getCurrentPosition());
                 telemetry.addData("ActualB",  "%7d:%7d",      leftMotorB.getCurrentPosition(),
                         rightMotorB.getCurrentPosition());
+                telemetry.addData("Time Elapsed: ", "%2.5f S Elapsed", runtime.seconds());
                 telemetry.update();
             }
 
@@ -473,7 +474,7 @@ public abstract class AutonomousMode extends LinearOpMode {
         rightMotorB.setPower(Range.clip(-power*trigo, -1, 1));
 
 
-        while(leftMotorF.isBusy() && leftMotorB.isBusy() && rightMotorF.isBusy() && rightMotorB.isBusy()){
+        while(opModeIsActive() && leftMotorF.isBusy() && leftMotorB.isBusy() && rightMotorF.isBusy() && rightMotorB.isBusy()){
             //wait until target position is reached
         }
 

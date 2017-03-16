@@ -25,7 +25,7 @@ public class AutonomousBeta extends AutonomousMode {
         rightMotorB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Turn right 90 degrees
-        encoderTurn(TURN_SPEED, 1680, 1);
+        encoderTurn(TURN_SPEED, 3000, 1);
 
     }
 

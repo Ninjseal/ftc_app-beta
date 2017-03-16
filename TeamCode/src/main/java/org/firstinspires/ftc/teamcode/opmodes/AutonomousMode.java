@@ -472,7 +472,7 @@ public abstract class AutonomousMode extends LinearOpMode {
         rightMotorB.setPower(Range.clip(-power*trigo, -1, 1));
 
 
-        while(leftMotorF.isBusy() && leftMotorB.isBusy() && rightMotorF.isBusy() && rightMotorB.isBusy()){
+        while(opModeIsActive() && leftMotorF.isBusy() && leftMotorB.isBusy() && rightMotorF.isBusy() && rightMotorB.isBusy()){
             //wait until target position is reached
         }
 

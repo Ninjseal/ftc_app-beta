@@ -25,7 +25,7 @@ public class AutonomousModeTest extends AutonomousMode {
         rightMotorB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Turn right 90 degrees
-        gyroTurn(TURN_SPEED, 90);
+        encoderTurn(TURN_SPEED, 3000, -1);
 
     }
 
